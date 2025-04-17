@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,6 +9,7 @@ import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import UserDashboard from '@/components/dashboard/UserDashboard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { supabase } from '@/lib/supabase';
+import Sidebar from '@/components/layout/Sidebar';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -71,16 +71,24 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <DashboardHeader userRole={userRole} onSignOut={handleSignOut} isLoading={isLoading} />
+    <div className="flex min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <Sidebar userRole={userRole} />
+      
+      <main className="flex-1 ml-64 p-8">
+        <DashboardHeader 
+          userRole={userRole} 
+          onSignOut={handleSignOut} 
+          isLoading={isLoading} 
+        />
 
-      <div className="container mx-auto py-8 px-4">
-        {userRole === 'admin' ? (
-          <AdminDashboard userId={user?.id} />
-        ) : (
-          <UserDashboard userId={user?.id} />
-        )}
-      </div>
+        <div className="container mx-auto py-8 px-4">
+          {userRole === 'admin' ? (
+            <AdminDashboard userId={user?.id} />
+          ) : (
+            <UserDashboard userId={user?.id} />
+          )}
+        </div>
+      </main>
     </div>
   );
 }
