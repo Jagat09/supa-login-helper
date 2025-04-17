@@ -1,8 +1,16 @@
-# Welcome to your Lovable project
+# Professional Supabase Authentication System
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/fd08594a-167e-40f3-9461-37cfe8ce70b8
+
+## Important: Connect Your Supabase Project
+
+This application includes a complete authentication UI built with Supabase. To make the authentication functional:
+
+1. Click the green Supabase button in the top right of the Lovable interface
+2. Connect to your Supabase project or create a new one
+3. After connection, replace the placeholder values in `src/lib/supabase.ts` with your actual Supabase URL and anon key
 
 ## How can I edit this code?
 
