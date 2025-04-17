@@ -93,12 +93,30 @@ export default function TaskCalendarView({ tasks }: TaskCalendarViewProps) {
               task => task.due_date && isSameDay(new Date(task.due_date), date)
             ),
           }}
-          styles={{
-            day: (date) => {
-              return {
-                className: getDayClassNames(date),
-              };
-            },
+          modifiersStyles={{
+            taskDates: { fontWeight: 'bold' }
+          }}
+          components={{
+            DayContent: (props) => {
+              const hasTask = tasks.some(task => 
+                task.due_date && isSameDay(new Date(task.due_date), props.date)
+              );
+              
+              const hasHighPriorityTask = tasks.some(task => 
+                task.due_date && 
+                isSameDay(new Date(task.due_date), props.date) && 
+                task.priority === 'high'
+              );
+              
+              let className = "";
+              if (hasHighPriorityTask) {
+                className = "bg-red-100 text-red-900 font-semibold p-1 rounded-full";
+              } else if (hasTask) {
+                className = "bg-blue-50 font-medium p-1 rounded-full";
+              }
+              
+              return <div className={className}>{props.date.getDate()}</div>;
+            }
           }}
           showOutsideDays={false}
         />
@@ -176,3 +194,4 @@ export default function TaskCalendarView({ tasks }: TaskCalendarViewProps) {
     </div>
   );
 }
+
