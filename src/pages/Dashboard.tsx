@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,11 +25,8 @@ export default function Dashboard() {
       if (!user) return;
       
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+        // Use the RPC function instead of directly querying the users table
+        const { data, error } = await supabase.rpc('get_current_user_role');
         
         if (error) {
           console.error('Error fetching user role:', error);
@@ -38,7 +36,7 @@ export default function Dashboard() {
             variant: "destructive",
           });
         } else {
-          setUserRole(data.role);
+          setUserRole(data);
         }
       } catch (err) {
         console.error('Exception when fetching user role:', err);

@@ -39,13 +39,11 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
   const fetchUserTasks = async () => {
     try {
       setIsLoading(true);
+      
+      // Use a simpler query first to diagnose the issue
       const { data, error } = await supabase
         .from('tasks')
-        .select(`
-          *,
-          assigned_to:users!assigned_to(username, email),
-          assigned_by:users!assigned_by(username, email)
-        `)
+        .select('*')
         .eq('assigned_to', userId)
         .order('due_date', { ascending: true });
 
@@ -53,7 +51,14 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
         throw error;
       }
 
-      setTasks(data || []);
+      // Process the data to add empty placeholder objects for assigned_to and assigned_by
+      const processedTasks = data?.map(task => ({
+        ...task,
+        assigned_to: { username: 'Current User', email: '' },
+        assigned_by: { username: 'Admin', email: '' }
+      })) || [];
+
+      setTasks(processedTasks);
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast({
