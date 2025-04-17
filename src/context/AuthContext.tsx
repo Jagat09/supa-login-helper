@@ -57,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         success: !error,
       };
     } catch (error) {
+      console.error("Sign in error:", error);
       return {
         error: error as Error,
         success: false,
@@ -78,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         success: !error,
       };
     } catch (error) {
+      console.error("Sign up error:", error);
       return {
         error: error as Error,
         success: false,
@@ -99,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         success: !error,
       };
     } catch (error) {
+      console.error("Reset password error:", error);
       return {
         error: error as Error,
         success: false,

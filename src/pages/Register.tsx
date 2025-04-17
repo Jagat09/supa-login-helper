@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -9,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Mail, Lock, AlertCircle, User } from 'lucide-react';
+import { Loader2, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 // Form validation schema with password confirmation
@@ -44,18 +43,26 @@ export default function Register() {
     setAuthError(null);
     
     const { email, password } = values;
-    const { error, success } = await signUp(email, password);
     
-    setIsLoading(false);
-    
-    if (success) {
-      setSuccess(true);
-      toast({
-        title: "Registration successful!",
-        description: "Please check your email to confirm your account.",
-      });
-    } else {
-      setAuthError(error?.message || 'Failed to sign up. Please try again.');
+    try {
+      const { error, success } = await signUp(email, password);
+      
+      setIsLoading(false);
+      
+      if (success) {
+        setSuccess(true);
+        toast({
+          title: "Registration successful!",
+          description: "Please check your email to confirm your account or proceed to login.",
+        });
+        navigate('/login');
+      } else {
+        setAuthError(error?.message || 'Failed to sign up. Please try again.');
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      setIsLoading(false);
+      setAuthError('An unexpected error occurred. Please try again.');
     }
   }
 

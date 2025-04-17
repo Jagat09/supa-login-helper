@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -36,19 +35,26 @@ export default function Login() {
     setIsLoading(true);
     setAuthError(null);
     
-    const { email, password } = values;
-    const { error, success } = await signIn(email, password);
-    
-    setIsLoading(false);
-    
-    if (success) {
-      toast({
-        title: "Welcome back!",
-        description: "You've been successfully logged in.",
-      });
-      navigate('/dashboard');
-    } else {
-      setAuthError(error?.message || 'Failed to sign in. Please check your credentials.');
+    try {
+      const { email, password } = values;
+      const { error, success } = await signIn(email, password);
+      
+      setIsLoading(false);
+      
+      if (success) {
+        toast({
+          title: "Welcome back!",
+          description: "You've been successfully logged in.",
+        });
+        navigate('/dashboard');
+      } else {
+        console.error("Auth error:", error);
+        setAuthError(error?.message || 'Failed to sign in. Please check your credentials.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setIsLoading(false);
+      setAuthError('An unexpected error occurred. Please try again.');
     }
   }
 
