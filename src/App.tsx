@@ -17,7 +17,14 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,7 +35,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />

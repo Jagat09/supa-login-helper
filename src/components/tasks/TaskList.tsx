@@ -22,7 +22,9 @@ import {
   CheckSquare, 
   ChevronDown, 
   ClipboardList, 
-  User 
+  User, 
+  AlertTriangle,
+  Flag
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -68,11 +70,26 @@ export default function TaskList({ tasks, onStatusUpdate, isAdmin }: TaskListPro
   const getPriorityBadge = (priority: string) => {
     switch (priority.toLowerCase()) {
       case 'high':
-        return <Badge className="bg-red-500 hover:bg-red-600">High</Badge>;
+        return (
+          <div className="flex items-center gap-1.5">
+            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <Badge className="bg-red-500 hover:bg-red-600">High</Badge>
+          </div>
+        );
       case 'medium':
-        return <Badge className="bg-amber-500 hover:bg-amber-600">Medium</Badge>;
+        return (
+          <div className="flex items-center gap-1.5">
+            <Flag className="h-4 w-4 text-amber-500" />
+            <Badge className="bg-amber-500 hover:bg-amber-600">Medium</Badge>
+          </div>
+        );
       case 'low':
-        return <Badge className="bg-green-500 hover:bg-green-600">Low</Badge>;
+        return (
+          <div className="flex items-center gap-1.5">
+            <Flag className="h-4 w-4 text-green-500" />
+            <Badge className="bg-green-500 hover:bg-green-600">Low</Badge>
+          </div>
+        );
       default:
         return <Badge variant="outline">{priority}</Badge>;
     }
@@ -92,7 +109,7 @@ export default function TaskList({ tasks, onStatusUpdate, isAdmin }: TaskListPro
   };
 
   return (
-    <div className="border rounded-md overflow-hidden">
+    <div className="border rounded-md overflow-hidden shadow-sm">
       <Table>
         <TableHeader>
           <TableRow className="bg-slate-50">
@@ -106,7 +123,7 @@ export default function TaskList({ tasks, onStatusUpdate, isAdmin }: TaskListPro
         </TableHeader>
         <TableBody>
           {tasks.map((task) => (
-            <TableRow key={task.id}>
+            <TableRow key={task.id} className="hover:bg-slate-50">
               <TableCell className="font-medium">
                 <div>
                   <div className="font-medium">{task.title}</div>
