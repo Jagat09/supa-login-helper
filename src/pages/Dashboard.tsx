@@ -24,11 +24,7 @@ export default function Dashboard() {
       if (!user) return;
       
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+        const { data, error } = await supabase.rpc('get_user_role');
         
         if (error) {
           console.error('Error fetching user role:', error);
@@ -37,8 +33,8 @@ export default function Dashboard() {
             description: "Could not fetch user role. Please try again later.",
             variant: "destructive",
           });
-        } else if (data) {
-          setUserRole(data.role);
+        } else {
+          setUserRole(data);
         }
       } catch (err) {
         console.error('Exception when fetching user role:', err);

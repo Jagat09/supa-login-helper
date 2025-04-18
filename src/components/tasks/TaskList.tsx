@@ -1,4 +1,3 @@
-
 import { 
   Table, 
   TableBody, 
@@ -21,12 +20,11 @@ import {
   Calendar, 
   CheckSquare, 
   ChevronDown, 
-  ClipboardList, 
-  User, 
-  AlertTriangle,
-  Flag
+  ClipboardList,
+  User
 } from "lucide-react";
 import { format } from "date-fns";
+import { TaskPriorityBadge } from "./TaskPriorityBadge";
 
 interface Task {
   id: string;
@@ -67,34 +65,6 @@ export default function TaskList({ tasks, onStatusUpdate, isAdmin }: TaskListPro
     );
   }
 
-  const getPriorityBadge = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return (
-          <div className="flex items-center gap-1.5">
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-            <Badge className="bg-red-500 hover:bg-red-600">High</Badge>
-          </div>
-        );
-      case 'medium':
-        return (
-          <div className="flex items-center gap-1.5">
-            <Flag className="h-4 w-4 text-amber-500" />
-            <Badge className="bg-amber-500 hover:bg-amber-600">Medium</Badge>
-          </div>
-        );
-      case 'low':
-        return (
-          <div className="flex items-center gap-1.5">
-            <Flag className="h-4 w-4 text-green-500" />
-            <Badge className="bg-green-500 hover:bg-green-600">Low</Badge>
-          </div>
-        );
-      default:
-        return <Badge variant="outline">{priority}</Badge>;
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
@@ -128,11 +98,15 @@ export default function TaskList({ tasks, onStatusUpdate, isAdmin }: TaskListPro
                 <div>
                   <div className="font-medium">{task.title}</div>
                   {task.description && (
-                    <div className="text-sm text-gray-500 mt-1 line-clamp-2">{task.description}</div>
+                    <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+                      {task.description}
+                    </div>
                   )}
                 </div>
               </TableCell>
-              <TableCell>{getPriorityBadge(task.priority)}</TableCell>
+              <TableCell>
+                <TaskPriorityBadge priority={task.priority} />
+              </TableCell>
               <TableCell>{getStatusBadge(task.status)}</TableCell>
               <TableCell>
                 {task.due_date ? (
