@@ -84,7 +84,7 @@ export default function Dashboard() {
           {userRole === 'admin' ? (
             <AdminDashboard userId={user?.id} />
           ) : (
-            <UserDashboard userId={user?.id} />
+            <UserDashboard userId={user?.id} userRole={userRole} />
           )}
         </div>
       </main>

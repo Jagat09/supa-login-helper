@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
@@ -22,9 +23,10 @@ import TaskCalendarView from '@/components/tasks/TaskCalendarView';
 
 interface UserDashboardProps {
   userId: string | undefined;
+  userRole?: string | null; // Add userRole prop
 }
 
-export default function UserDashboard({ userId }: UserDashboardProps) {
+export default function UserDashboard({ userId, userRole }: UserDashboardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [tasks, setTasks] = useState<any[]>([]);
   const { toast } = useToast();
@@ -105,6 +107,8 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
     return dueDate <= threeDaysFromNow && dueDate >= today && task.status !== 'completed';
   });
 
+  const isAdmin = userRole === 'admin';
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -131,7 +135,7 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className={userRole === 'user' ? "border-auth-200" : ""}>
+        <Card className={isAdmin ? "border-auth-200" : ""}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Tasks
@@ -205,7 +209,7 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
             <TaskList 
               tasks={tasks} 
               onStatusUpdate={handleStatusUpdate} 
-              isAdmin={false}
+              isAdmin={isAdmin}
             />
           )}
         </TabsContent>
