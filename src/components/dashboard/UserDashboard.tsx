@@ -23,7 +23,7 @@ import TaskCalendarView from '@/components/tasks/TaskCalendarView';
 
 interface UserDashboardProps {
   userId: string | undefined;
-  userRole?: string | null; // Add userRole prop
+  userRole?: string | null;
 }
 
 export default function UserDashboard({ userId, userRole }: UserDashboardProps) {
@@ -41,6 +41,7 @@ export default function UserDashboard({ userId, userRole }: UserDashboardProps) 
     try {
       setIsLoading(true);
       
+      // Simplified query to avoid recursion issues with RLS policies
       const { data, error } = await supabase
         .from('tasks')
         .select('*')

@@ -25,7 +25,7 @@ export default function Dashboard() {
       if (!user) return;
       
       try {
-        // Use the security definer function to avoid infinite recursion
+        // Use the get_user_role security definer function
         const { data, error } = await supabase.rpc('get_user_role');
         
         if (error) {
