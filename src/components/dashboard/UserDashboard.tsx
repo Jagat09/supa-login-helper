@@ -3,23 +3,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 import TaskList from '@/components/tasks/TaskList';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
-import { 
-  Card,
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { CalendarDateRangePicker } from '@/components/tasks/DateRangePicker';
-import { Loader2, CheckSquare, Clock } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import TaskCalendarView from '@/components/tasks/TaskCalendarView';
+import { TaskStats } from './stats/TaskStats';
+import { EmptyTaskState } from './EmptyTaskState';
 
 interface UserDashboardProps {
   userId: string | undefined;
@@ -41,7 +31,6 @@ export default function UserDashboard({ userId, userRole }: UserDashboardProps) 
     try {
       setIsLoading(true);
       
-      // Simplified query to avoid recursion issues with RLS policies
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
@@ -122,7 +111,6 @@ export default function UserDashboard({ userId, userRole }: UserDashboardProps) 
 
         <div className="flex items-center gap-4">
           <CalendarDateRangePicker />
-          
           <Button 
             variant="outline" 
             size="icon" 
@@ -135,65 +123,14 @@ export default function UserDashboard({ userId, userRole }: UserDashboardProps) 
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className={isAdmin ? "border-auth-200" : ""}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Tasks
-            </CardTitle>
-            <CheckSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalTasks}</div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Completed: {completedTasks} | In Progress: {inProgressTasks} | Pending: {pendingTasks}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-amber-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Tasks Due Soon
-            </CardTitle>
-            <Clock className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{tasksDueSoon.length}</div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Tasks due within the next 3 days
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Completion Rate
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0}%
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              {completedTasks} completed out of {totalTasks} total tasks
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <TaskStats
+        totalTasks={totalTasks}
+        completedTasks={completedTasks}
+        pendingTasks={pendingTasks}
+        inProgressTasks={inProgressTasks}
+        tasksDueSoon={tasksDueSoon.length}
+        isAdmin={isAdmin}
+      />
 
       <Tabs defaultValue="list" className="w-full">
         <TabsList className="mb-4">
@@ -220,19 +157,7 @@ export default function UserDashboard({ userId, userRole }: UserDashboardProps) 
         </TabsContent>
       </Tabs>
 
-      {tasks.length === 0 && !isLoading && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="rounded-full bg-primary/10 p-4 mb-4">
-              <CheckSquare className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">No Tasks Assigned</h3>
-            <p className="text-muted-foreground text-center max-w-md">
-              You don't have any tasks assigned to you yet. They will appear here once an administrator assigns them to you.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      {tasks.length === 0 && !isLoading && <EmptyTaskState />}
     </div>
   );
 }
