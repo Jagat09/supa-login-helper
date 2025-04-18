@@ -39,14 +39,9 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
     try {
       setIsLoading(true);
       
-      // Improved query to correctly fetch tasks with related user data
       const { data, error } = await supabase
         .from('tasks')
-        .select(`
-          *,
-          assigned_to:users!assigned_to(username, email),
-          assigned_by:users!assigned_by(username, email)
-        `)
+        .select('*')
         .eq('assigned_to', userId)
         .order('due_date', { ascending: true });
 
@@ -54,6 +49,7 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
         throw error;
       }
 
+      console.log("Tasks fetched successfully:", data);
       setTasks(data || []);
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -76,7 +72,6 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
 
       if (error) throw error;
 
-      // Update local state
       setTasks(tasks.map(task => 
         task.id === taskId ? { ...task, status } : task
       ));
@@ -95,13 +90,11 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
     }
   };
 
-  // Calculate task statistics
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const pendingTasks = tasks.filter(task => task.status === 'pending').length;
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
   
-  // Get tasks due soon (within next 3 days)
   const today = new Date();
   const threeDaysFromNow = new Date();
   threeDaysFromNow.setDate(today.getDate() + 3);
@@ -130,6 +123,7 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
             size="icon" 
             onClick={fetchUserTasks}
             title="Refresh tasks"
+            className={isLoading ? "animate-spin" : ""}
           >
             <Loader2 className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
@@ -137,7 +131,7 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+        <Card className={userRole === 'user' ? "border-auth-200" : ""}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Tasks
@@ -152,7 +146,7 @@ export default function UserDashboard({ userId }: UserDashboardProps) {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-amber-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Tasks Due Soon

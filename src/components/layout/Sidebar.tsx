@@ -6,7 +6,8 @@ import {
   BarChart, 
   Settings, 
   Home, 
-  LogOut 
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,28 +18,40 @@ interface SidebarItemProps {
   label: string;
   href: string;
   isActive: boolean;
+  isAdminOnly?: boolean;
+  userRole?: string | null;
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({ 
   icon: Icon, 
   label, 
   href, 
-  isActive 
-}) => (
-  <Link 
-    to={href} 
-    className={`
-      flex items-center p-3 rounded-lg transition-colors duration-200 
-      ${isActive 
-        ? 'bg-auth-100 text-auth-600' 
-        : 'text-gray-600 hover:bg-gray-100'
-      }
-    `}
-  >
-    <Icon className="mr-3 h-5 w-5" />
-    <span className="text-sm font-medium">{label}</span>
-  </Link>
-);
+  isActive,
+  isAdminOnly,
+  userRole 
+}) => {
+  const isAdmin = userRole === 'admin';
+  
+  // Don't render admin-only items for non-admin users
+  if (isAdminOnly && !isAdmin) return null;
+  
+  return (
+    <Link 
+      to={href} 
+      className={`
+        flex items-center p-3 rounded-lg transition-colors duration-200 
+        ${isActive 
+          ? 'bg-auth-100 text-auth-600' 
+          : 'text-gray-600 hover:bg-gray-100'
+        }
+      `}
+    >
+      <Icon className="mr-3 h-5 w-5" />
+      <span className="text-sm font-medium">{label}</span>
+      {isAdminOnly && <ShieldCheck className="ml-2 h-3 w-3 text-auth-600" />}
+    </Link>
+  );
+};
 
 interface SidebarProps {
   userRole: string | null;
@@ -47,56 +60,42 @@ interface SidebarProps {
 export default function Sidebar({ userRole }: SidebarProps) {
   const location = useLocation();
   const { signOut } = useAuth();
+  const isAdmin = userRole === 'admin';
 
   const isActive = (path: string) => location.pathname === path;
 
-  const adminNavItems = [
+  const navItems = [
     { 
       icon: Home, 
       label: 'Dashboard', 
-      href: '/dashboard' 
+      href: '/dashboard',
+      isAdminOnly: false
     },
     { 
       icon: ClipboardList, 
-      label: 'Tasks', 
-      href: '/tasks' 
+      label: isAdmin ? 'All Tasks' : 'My Tasks', 
+      href: '/tasks',
+      isAdminOnly: false
     },
     { 
       icon: Users, 
       label: 'Team', 
-      href: '/team' 
+      href: '/team',
+      isAdminOnly: true
     },
     { 
       icon: BarChart, 
       label: 'Analytics', 
-      href: '/analytics' 
+      href: '/analytics',
+      isAdminOnly: true
     },
     { 
       icon: Settings, 
-      label: 'Settings', 
-      href: '/settings' 
+      label: isAdmin ? 'Settings' : 'Profile', 
+      href: isAdmin ? '/settings' : '/profile',
+      isAdminOnly: false
     }
   ];
-
-  const userNavItems = [
-    { 
-      icon: Home, 
-      label: 'Dashboard', 
-      href: '/dashboard' 
-    },
-    { 
-      icon: ClipboardList, 
-      label: 'My Tasks', 
-      href: '/tasks' 
-    },
-    { 
-      icon: Settings, 
-      label: 'Profile', 
-      href: '/profile' 
-    }
-  ];
-
-  const navItems = userRole === 'admin' ? adminNavItems : userNavItems;
 
   return (
     <div className="
@@ -105,10 +104,16 @@ export default function Sidebar({ userRole }: SidebarProps) {
       shadow-sm py-8 px-4 
       flex flex-col
     ">
-      <div className="mb-10 pl-4">
+      <div className="mb-10 pl-4 flex items-center">
         <h2 className="text-2xl font-bold text-auth-600">
           Task Manager
         </h2>
+        {isAdmin && (
+          <span className="ml-2 flex items-center text-xs bg-auth-600 text-white px-2 py-1 rounded">
+            <ShieldCheck className="mr-1 h-3 w-3" />
+            ADMIN
+          </span>
+        )}
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -117,6 +122,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
             key={item.href}
             {...item}
             isActive={isActive(item.href)}
+            userRole={userRole}
           />
         ))}
       </nav>

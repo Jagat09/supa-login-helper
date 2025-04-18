@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,6 +25,7 @@ export default function Dashboard() {
       if (!user) return;
       
       try {
+        // Use the security definer function to avoid infinite recursion
         const { data, error } = await supabase.rpc('get_user_role');
         
         if (error) {
@@ -35,6 +37,7 @@ export default function Dashboard() {
           });
         } else {
           setUserRole(data);
+          console.log("User role fetched successfully:", data);
         }
       } catch (err) {
         console.error('Exception when fetching user role:', err);
@@ -59,9 +62,9 @@ export default function Dashboard() {
 
   if (isRoleLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="h-8 w-8 animate-spin text-auth-600" />
-        <span className="ml-2 text-lg text-gray-700">Loading dashboard...</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+        <Loader2 className="h-8 w-8 animate-spin text-auth-600 mb-2" />
+        <span className="text-lg text-gray-700">Loading dashboard...</span>
       </div>
     );
   }
