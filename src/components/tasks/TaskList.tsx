@@ -1,3 +1,4 @@
+
 import { 
   Table, 
   TableBody, 
@@ -29,17 +30,19 @@ import { TaskPriorityBadge } from "./TaskPriorityBadge";
 interface Task {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   priority: string;
   status: string;
-  due_date: string;
+  due_date: string | null;
   assigned_to: {
-    username: string;
-    email: string;
+    id: string;
+    username?: string;
+    email?: string;
   } | null;
   assigned_by: {
-    username: string;
-    email: string;
+    id: string;
+    username?: string;
+    email?: string;
   } | null;
 }
 
@@ -50,7 +53,7 @@ interface TaskListProps {
 }
 
 export default function TaskList({ tasks, onStatusUpdate, isAdmin }: TaskListProps) {
-  if (tasks.length === 0) {
+  if (!tasks || tasks.length === 0) {
     return (
       <div className="text-center py-10 bg-slate-50 rounded-md">
         <ClipboardList className="mx-auto h-12 w-12 text-gray-400" />
@@ -122,7 +125,7 @@ export default function TaskList({ tasks, onStatusUpdate, isAdmin }: TaskListPro
                 {task.assigned_to ? (
                   <div className="flex items-center gap-1.5">
                     <User className="h-4 w-4 text-gray-500" />
-                    <span>{task.assigned_to.username}</span>
+                    <span>{task.assigned_to.username || 'User'}</span>
                   </div>
                 ) : (
                   <span className="text-gray-500">Unassigned</span>

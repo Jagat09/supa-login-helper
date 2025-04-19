@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
@@ -40,7 +41,7 @@ export default function TaskForm({ users, currentUserId, onTaskCreated, onCancel
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
-  const [assignedTo, setAssignedTo] = useState('');
+  const [assignedTo, setAssignedTo] = useState('unassigned'); // Changed default to unassigned instead of empty string
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -67,15 +68,27 @@ export default function TaskForm({ users, currentUserId, onTaskCreated, onCancel
           description,
           priority,
           status: 'pending',
+          // Only set assigned_to if not unassigned
           assigned_to: assignedTo === 'unassigned' ? null : assignedTo,
           assigned_by: currentUserId,
           due_date: dueDate ? dueDate.toISOString() : null,
         })
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
 
-      onTaskCreated(data[0]);
+      console.log("Task created successfully:", data);
+      
+      if (data && data.length > 0) {
+        onTaskCreated(data[0]);
+        toast({
+          title: 'Success',
+          description: 'Task created successfully',
+        });
+      }
       
     } catch (error) {
       console.error('Error creating task:', error);

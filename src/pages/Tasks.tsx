@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { fetchTasks, fetchUsersSimple, supabase } from '@/lib/supabase';
+import { fetchTasks, fetchUsersSimple, updateTaskStatus } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 import TaskList from '@/components/tasks/TaskList';
 import TaskForm from '@/components/tasks/TaskForm';
@@ -64,11 +65,16 @@ export default function Tasks() {
 
   const loadData = async () => {
     setIsLoading(true);
-    await Promise.all([
-      loadTasks(),
-      loadUsers()
-    ]);
-    setIsLoading(false);
+    try {
+      await Promise.all([
+        loadTasks(),
+        loadUsers()
+      ]);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const loadTasks = async () => {
@@ -80,6 +86,7 @@ export default function Tasks() {
       }
 
       setTasks(data || []);
+      console.log("Tasks loaded:", data);
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast({
@@ -99,6 +106,7 @@ export default function Tasks() {
       }
 
       setUsers(data || []);
+      console.log("Users loaded:", data);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
@@ -120,10 +128,7 @@ export default function Tasks() {
 
   const handleStatusUpdate = async (taskId: string, status: string) => {
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq('id', taskId);
+      const { error } = await updateTaskStatus(taskId, status);
 
       if (error) throw error;
 
@@ -166,6 +171,7 @@ export default function Tasks() {
       <DashboardHeader
         heading="Tasks Management"
         text="Create, assign, and manage tasks for your team."
+        userRole={userRole}
       />
 
       <div className="flex items-center justify-between">
@@ -208,7 +214,7 @@ export default function Tasks() {
           <div className="flex items-center gap-2">
             <Select 
               value={taskView} 
-              onValueChange={(value: 'all' | 'mine' | 'unassigned') => setTaskView(value)}
+              onValueChange={(value: any) => setTaskView(value)}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter Tasks" />

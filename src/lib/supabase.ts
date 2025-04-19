@@ -9,59 +9,109 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Function to safely get user data without triggering infinite recursion
 export const fetchUsersSimple = async () => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('id, username, email, role')
-    .order('username');
-  
-  return { data, error };
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, username, email, role')
+      .order('username');
+    
+    if (error) {
+      console.error('Error fetching users:', error);
+      throw error;
+    }
+    
+    console.log('Users fetched:', data);
+    return { data, error };
+  } catch (error) {
+    console.error('Error in fetchUsersSimple:', error);
+    return { data: null, error };
+  }
 }
 
-// Function to safely get task data without complex joins
+// Function to safely get task data with user information
 export const fetchTasks = async (filterBy = null) => {
-  let query = supabase
-    .from('tasks')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
-  // Apply filter if provided (like user ID)
-  if (filterBy && filterBy.userId) {
-    query = query.eq('assigned_to', filterBy.userId);
-  }
-  
-  const { data, error } = await query;
-  
-  // If we have tasks and user data, manually join the data
-  if (data && data.length > 0) {
-    // Get unique user IDs from tasks
-    const userIds = [...new Set([
-      ...data.map(task => task.assigned_to).filter(Boolean),
-      ...data.map(task => task.assigned_by).filter(Boolean)
-    ])];
+  try {
+    console.log('Fetching tasks...');
     
-    if (userIds.length > 0) {
-      const { data: users } = await supabase
-        .from('users')
-        .select('id, username, email')
-        .in('id', userIds);
-      
-      // Create a map for quick lookup
-      const userMap = {};
-      if (users) {
-        users.forEach(user => { userMap[user.id] = user; });
-      }
-      
-      // Manually join the data
-      return { 
-        data: data.map(task => ({
-          ...task,
-          assigned_to: task.assigned_to ? userMap[task.assigned_to] || null : null,
-          assigned_by: task.assigned_by ? userMap[task.assigned_by] || null : null
-        })),
-        error 
-      };
+    // First fetch all tasks
+    let query = supabase
+      .from('tasks')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    // Apply filter if provided (like user ID)
+    if (filterBy && filterBy.userId) {
+      query = query.eq('assigned_to', filterBy.userId);
     }
+    
+    const { data: tasks, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching tasks:', error);
+      throw error;
+    }
+    
+    console.log('Tasks fetched:', tasks);
+    
+    // If we have tasks, fetch user data separately
+    if (tasks && tasks.length > 0) {
+      // Get unique user IDs from tasks
+      const userIds = [...new Set([
+        ...tasks.map(task => task.assigned_to).filter(Boolean),
+        ...tasks.map(task => task.assigned_by).filter(Boolean)
+      ])];
+      
+      if (userIds.length > 0) {
+        const { data: users, error: userError } = await supabase
+          .from('users')
+          .select('id, username, email')
+          .in('id', userIds);
+        
+        if (userError) {
+          console.error('Error fetching users for tasks:', userError);
+        }
+        
+        // Create a map for quick lookup
+        const userMap = {};
+        if (users && users.length > 0) {
+          users.forEach(user => { userMap[user.id] = user; });
+        }
+        
+        // Manually join the data
+        const enhancedTasks = tasks.map(task => ({
+          ...task,
+          assigned_to: task.assigned_to ? userMap[task.assigned_to] || { id: task.assigned_to } : null,
+          assigned_by: task.assigned_by ? userMap[task.assigned_by] || { id: task.assigned_by } : null
+        }));
+        
+        return { data: enhancedTasks, error: null };
+      }
+    }
+    
+    // Return tasks without user data if we couldn't fetch users
+    return { data: tasks, error: null };
+  } catch (error) {
+    console.error('Error in fetchTasks:', error);
+    return { data: null, error };
   }
-  
-  return { data, error };
+}
+
+// Function to update task status
+export const updateTaskStatus = async (taskId: string, status: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('tasks')
+      .update({ 
+        status, 
+        updated_at: new Date().toISOString() 
+      })
+      .eq('id', taskId)
+      .select();
+    
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error updating task status:', error);
+    return { data: null, error };
+  }
 }
