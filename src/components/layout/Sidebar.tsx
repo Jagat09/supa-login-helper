@@ -1,142 +1,151 @@
 
-import React from 'react';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { 
-  ClipboardList, 
+  LayoutDashboard, 
   Users, 
-  BarChart, 
+  CheckSquare, 
   Settings, 
-  Home, 
-  LogOut,
-  ShieldCheck
-} from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+  BarChart4,
+  Menu,
+  X
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useMobile } from "@/hooks/use-mobile";
 
-interface SidebarItemProps {
-  icon: React.ElementType;
-  label: string;
-  href: string;
-  isActive: boolean;
-  isAdminOnly?: boolean;
-  userRole?: string | null;
-}
-
-const SidebarItem: React.FC<SidebarItemProps> = ({ 
-  icon: Icon, 
-  label, 
-  href, 
-  isActive,
-  isAdminOnly,
-  userRole 
-}) => {
-  const isAdmin = userRole === 'admin';
-  
-  // Don't render admin-only items for non-admin users
-  if (isAdminOnly && !isAdmin) return null;
-  
-  return (
-    <Link 
-      to={href} 
-      className={`
-        flex items-center p-3 rounded-lg transition-colors duration-200 
-        ${isActive 
-          ? 'bg-auth-100 text-auth-600' 
-          : 'text-gray-600 hover:bg-gray-100'
-        }
-      `}
-    >
-      <Icon className="mr-3 h-5 w-5" />
-      <span className="text-sm font-medium">{label}</span>
-      {isAdminOnly && <ShieldCheck className="ml-2 h-3 w-3 text-auth-600" />}
-    </Link>
-  );
-};
-
-interface SidebarProps {
-  userRole: string | null;
-}
-
-export default function Sidebar({ userRole }: SidebarProps) {
+export function Sidebar() {
+  const { user } = useAuth();
   const location = useLocation();
-  const { signOut } = useAuth();
-  const isAdmin = userRole === 'admin';
+  const isMobile = useMobile();
+  const [isOpen, setIsOpen] = useState(!isMobile);
 
-  const isActive = (path: string) => location.pathname === path;
-
-  const navItems = [
-    { 
-      icon: Home, 
-      label: 'Dashboard', 
-      href: '/dashboard',
-      isAdminOnly: false
+  const menuItems = [
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
     },
-    { 
-      icon: ClipboardList, 
-      label: isAdmin ? 'All Tasks' : 'My Tasks', 
-      href: '/tasks',
-      isAdminOnly: false
+    {
+      name: "Tasks",
+      href: "/tasks",
+      icon: CheckSquare,
     },
-    { 
-      icon: Users, 
-      label: 'Team', 
-      href: '/team',
-      isAdminOnly: true
+    {
+      name: "Team",
+      href: "/team",
+      icon: Users,
     },
-    { 
-      icon: BarChart, 
-      label: 'Analytics', 
-      href: '/analytics',
-      isAdminOnly: true
+    {
+      name: "Analytics",
+      href: "/analytics",
+      icon: BarChart4,
     },
-    { 
-      icon: Settings, 
-      label: isAdmin ? 'Settings' : 'Profile', 
-      href: isAdmin ? '/settings' : '/profile',
-      isAdminOnly: false
-    }
+    {
+      name: "Settings",
+      href: "/profile",
+      icon: Settings,
+    },
   ];
 
+  const getInitials = (email: string | undefined) => {
+    if (!email) return "U";
+    return email.substring(0, 2).toUpperCase();
+  };
+
   return (
-    <div className="
-      fixed left-0 top-0 h-full w-64 
-      bg-white border-r 
-      shadow-sm py-8 px-4 
-      flex flex-col
-    ">
-      <div className="mb-10 pl-4 flex items-center">
-        <h2 className="text-2xl font-bold text-auth-600">
-          Task Manager
-        </h2>
-        {isAdmin && (
-          <span className="ml-2 flex items-center text-xs bg-auth-600 text-white px-2 py-1 rounded">
-            <ShieldCheck className="mr-1 h-3 w-3" />
-            ADMIN
-          </span>
-        )}
-      </div>
+    <Collapsible
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className={cn(
+        "border-r bg-background z-10",
+        isOpen
+          ? "fixed md:sticky top-0 w-[240px] h-screen"
+          : "fixed top-0 w-0 md:w-[80px] h-screen"
+      )}
+    >
+      <div className="flex h-full flex-col">
+        <div className="flex items-center justify-between h-14 border-b px-4 py-2">
+          <Link
+            to="/"
+            className={cn(
+              "flex items-center gap-2 font-semibold",
+              !isOpen && "md:hidden"
+            )}
+          >
+            <Avatar className="h-6 w-6 bg-primary text-primary-foreground">
+              <AvatarFallback>T</AvatarFallback>
+            </Avatar>
+            <span>TaskMaster</span>
+          </Link>
 
-      <nav className="flex-1 space-y-2">
-        {navItems.map((item) => (
-          <SidebarItem
-            key={item.href}
-            {...item}
-            isActive={isActive(item.href)}
-            userRole={userRole}
-          />
-        ))}
-      </nav>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden">
+              {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </Button>
+          </CollapsibleTrigger>
 
-      <div className="mt-auto p-4 border-t">
-        <Button 
-          variant="outline" 
-          className="w-full justify-start"
-          onClick={signOut}
+          <div className="hidden md:block">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="icon">
+                {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+        </div>
+
+        <CollapsibleContent
+          forceMount
+          className={cn(
+            "flex flex-col gap-2 p-2 h-full",
+            !isOpen && "hidden md:flex md:items-center"
+          )}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
-        </Button>
+          <div className="flex flex-col gap-2 flex-1">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link to={item.href} key={item.href}>
+                  <Button
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn(
+                      "flex justify-start gap-2 w-full",
+                      !isOpen && "md:justify-center md:px-2"
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className={cn(!isOpen && "md:hidden")}>
+                      {item.name}
+                    </span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="mt-auto">
+            <Link to="/profile">
+              <Button
+                variant="ghost"
+                className={cn(
+                  "flex justify-start gap-2 w-full",
+                  !isOpen && "md:justify-center md:px-2"
+                )}
+              >
+                <Avatar className="h-6 w-6">
+                  <AvatarFallback>
+                    {getInitials(user?.email)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className={cn(!isOpen && "md:hidden")}>Profile</span>
+              </Button>
+            </Link>
+          </div>
+        </CollapsibleContent>
       </div>
-    </div>
+    </Collapsible>
   );
 }

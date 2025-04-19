@@ -17,6 +17,11 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
+// Task Management Pages
+import Tasks from "./pages/Tasks";
+import Team from "./pages/Team";
+import Analytics from "./pages/Analytics";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -46,7 +51,9 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
-              {/* Add more protected routes here */}
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/analytics" element={<Analytics />} />
             </Route>
             
             {/* Catch-all route */}
