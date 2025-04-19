@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Loader2, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import Sidebar from '@/components/layout/Sidebar';
+import { Sidebar } from '@/components/layout/Sidebar';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -31,7 +30,6 @@ export default function Profile() {
     try {
       setIsLoading(true);
       
-      // Use the security definer function we created in the SQL migration
       const { data, error } = await supabase.rpc('get_current_user_role');
       
       if (error) {
@@ -44,7 +42,6 @@ export default function Profile() {
         return;
       }
       
-      // Fetch user profile data
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('username, email, role')
@@ -102,9 +99,9 @@ export default function Profile() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <Sidebar userRole={userRole} />
+      <Sidebar />
       
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">My Profile</h1>
           <p className="text-muted-foreground mt-2">

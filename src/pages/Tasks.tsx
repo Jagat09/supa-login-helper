@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchTasks, fetchUsersSimple, supabase } from '@/lib/supabase';
@@ -24,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TaskCalendarView from '@/components/tasks/TaskCalendarView';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 
 export default function Tasks() {
   const { user } = useAuth();

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchUsersSimple, supabase } from '@/lib/supabase';
@@ -11,7 +10,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Loader2, Mail, Phone, Shield, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";

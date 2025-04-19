@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchTasks, supabase } from '@/lib/supabase';
@@ -10,7 +9,7 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Loader2 } from 'lucide-react';
 import { 
   PieChart, 

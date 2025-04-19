@@ -4,25 +4,29 @@ import { LogOut, ClipboardList, UserCircle, ShieldCheck } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 
 interface DashboardHeaderProps {
-  userRole: string | null;
-  onSignOut: () => void;
-  isLoading: boolean;
+  heading?: string;
+  text?: string;
+  userRole?: string | null;
+  onSignOut?: () => void;
+  isLoading?: boolean;
 }
 
-export default function DashboardHeader({ userRole, onSignOut, isLoading }: DashboardHeaderProps) {
+export default function DashboardHeader({ 
+  heading, 
+  text, 
+  userRole, 
+  onSignOut, 
+  isLoading 
+}: DashboardHeaderProps) {
   const isAdmin = userRole === 'admin';
   
   return (
-    <header className="sticky top-0 z-30 w-full bg-white border-b shadow-sm">
-      <div className="container mx-auto flex justify-between items-center py-4 px-4">
-        <div className="flex items-center">
-          <ClipboardList className="h-6 w-6 text-auth-600 mr-2" />
-          <h1 className="text-2xl font-bold text-gray-900">
-            Task Manager
-          </h1>
-        </div>
-        
-        <div className="flex items-center gap-4">
+    <header className="flex flex-col space-y-2 mb-8">
+      {heading && <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>}
+      {text && <p className="text-muted-foreground">{text}</p>}
+      
+      {onSignOut && (
+        <div className="flex items-center gap-4 mt-2">
           <div className={`flex items-center gap-2 text-sm ${isAdmin ? 'text-auth-600' : 'text-gray-600'} rounded-full px-3 py-1 ${isAdmin ? 'bg-auth-50' : ''}`}>
             {isAdmin ? (
               <>
@@ -51,7 +55,7 @@ export default function DashboardHeader({ userRole, onSignOut, isLoading }: Dash
             Sign out
           </Button>
         </div>
-      </div>
+      )}
     </header>
   );
 }

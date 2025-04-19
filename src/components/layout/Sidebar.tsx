@@ -15,12 +15,12 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function Sidebar() {
   const { user } = useAuth();
   const location = useLocation();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(!isMobile);
 
   const menuItems = [

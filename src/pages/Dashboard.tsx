@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,7 +9,7 @@ import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import UserDashboard from '@/components/dashboard/UserDashboard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { supabase } from '@/lib/supabase';
-import Sidebar from '@/components/layout/Sidebar';
+import { Sidebar } from '@/components/layout/Sidebar';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -25,7 +24,6 @@ export default function Dashboard() {
       if (!user) return;
       
       try {
-        // Use the get_user_role security definer function
         const { data, error } = await supabase.rpc('get_user_role');
         
         if (error) {
@@ -71,9 +69,9 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <Sidebar userRole={userRole} />
+      <Sidebar />
       
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 p-8">
         <DashboardHeader 
           userRole={userRole} 
           onSignOut={handleSignOut} 
