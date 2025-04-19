@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
@@ -121,7 +120,6 @@ export default function AdminDashboard({ userId }: AdminDashboardProps) {
 
       if (error) throw error;
 
-      // Update local state
       setTasks(tasks.map(task => 
         task.id === taskId ? { ...task, status } : task
       ));

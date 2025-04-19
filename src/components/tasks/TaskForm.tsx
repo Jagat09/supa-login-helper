@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
@@ -68,7 +67,7 @@ export default function TaskForm({ users, currentUserId, onTaskCreated, onCancel
           description,
           priority,
           status: 'pending',
-          assigned_to: assignedTo || null,
+          assigned_to: assignedTo === 'unassigned' ? null : assignedTo,
           assigned_by: currentUserId,
           due_date: dueDate ? dueDate.toISOString() : null,
         })
@@ -147,7 +146,7 @@ export default function TaskForm({ users, currentUserId, onTaskCreated, onCancel
                 <SelectValue placeholder="Select user" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Unassigned</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
                 <SelectGroup>
                   <SelectLabel>Team Members</SelectLabel>
                   {users.map((user) => (
