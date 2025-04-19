@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { fetchTasks, fetchUsersSimple, updateTaskStatus } from '@/lib/supabase';
+import { fetchTasks, fetchUsersSimple, updateTaskStatus, supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 import TaskList from '@/components/tasks/TaskList';
 import TaskForm from '@/components/tasks/TaskForm';
